@@ -1,0 +1,47 @@
+/****** Script for SelectTopNRows command from SSMS  ******/
+SELECT distinct 
+       myswp.[cr_indiv_key]
+      ,myswp.[home_anniversary]
+	  ,c.diy_whl
+	  ,c.cac_code
+	  ,c.account_deleted_flg
+	  ,c.cac_type
+	  ,isum.BEST_EMAIL_TXT
+	  ,addr.address_line1
+	  ,addr.address_line2
+	  ,addr.city
+	  ,addr.state_province_cd
+	  ,addr.country_cd
+	  ,message_name
+  FROM [CDL].[dbo].[MYSW_PROFILE] myswp
+  Join CDL.dbo.Customer c on myswp.cr_indiv_key=c.cr_indiv_key
+  Join CDL.dbo.Indiv_Summary isum on isum.CR_INDIV_KEY=myswp.cr_indiv_key
+  Join CDL.dbo.addr addr on isum.BEST_CR_ADDR_KEY = addr.cr_addr_key
+  where 
+  month(home_anniversary) = (month(getDate())+1)
+   --and year(home_anniversary) = (year(getDate())-1)
+  and
+  c.diy_whl='DIY'
+  and
+  c.cac_code in (1137, 1140, 1150)
+  and
+  c.cac_type in (10)
+  and
+  c.account_deleted_flg = 'N'
+  and
+  isum.DECEASED_IND<> 'Y'
+  and
+  isum.VULGAR_ADDRESS_IND <> 'Y'
+  and
+  isum.VULGAR_NAME_IND <> 'Y'
+  and
+  isum.EMAIL_CONTACTABLE='Y'
+  and
+  isum.BEST_EMAIL_TXT is not null
+  and
+  addr.state_province_cd in ('AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY', 'PR')
+  --still need to dedupe on email across indivs
+  --still need to assign a control group
+  --still need to assign metadata
+  
+  order by home_anniversary desc
